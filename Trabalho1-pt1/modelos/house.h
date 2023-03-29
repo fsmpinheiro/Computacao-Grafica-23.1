@@ -9,7 +9,7 @@ class House : public MyObject{
 
 public:
 
-    House();
+    House( );
     House( Vetor3D tn, Vetor3D an, Vetor3D sn );
     ~House();
 

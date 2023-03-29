@@ -25,7 +25,6 @@ void desenha( ){
 
     for( int i = 0; i < controller.getVectorSize( ); i++ ){
         glPushMatrix();
-            //controller.objectsVector[i]->desenha( );
             controller.getByIndex( i )->desenha( );
         glPopMatrix();
     }
@@ -38,6 +37,28 @@ void desenha( ){
             GUI::drawQuad(1.2, 3.4);
         glPopMatrix();
 
+
+    //modelando cercado diretamente no OpenGL
+        glPushMatrix();
+            GUI::setColor(0.60, 0.30,   0.1);
+            glTranslatef(1.05,   -0.000012,  -1.7);
+            GUI::drawBox(1.29,0,-0.8,1.32,0.5,0.8);
+        glPopMatrix();
+
+        glPushMatrix();
+            glTranslatef(3.05, 0.08, -2.3);
+            GUI::drawBox( -0.75, 0, 1.29, 0.75, 0.3, 1.32);
+        glPopMatrix();
+
+        glPushMatrix();
+            glTranslatef(2.45,   -0.000012,  -1.7);
+            GUI::drawBox(1.29,0,-0.8,1.32,0.5,0.8);
+        glPopMatrix();
+
+        glPushMatrix();
+            glTranslatef(3.05, 0.08, -3.75);
+            GUI::drawBox( -0.75, 0, 1.29, 0.75, 0.3, 1.32);
+        glPopMatrix();
 
 
     GUI::displayEnd();
@@ -77,15 +98,19 @@ void teclado(unsigned char key, int x, int y) {
         break;
     case '@':
         if( includNewObject ){
-            controller.insertObject( 2 ); //insere casa
+            controller.insertObject( 2 ); //insere cow
         }
         break;
     case '#':
         if( includNewObject ){
-            controller.insertObject( 3 ); //insere personagem
+            controller.insertObject( 3 ); //insere casa
         }
         break;
-
+    case '$':
+        if( includNewObject ){
+            controller.insertObject( 4 ); //insere reservatório
+        }
+        break;
     default:
         break;
     }

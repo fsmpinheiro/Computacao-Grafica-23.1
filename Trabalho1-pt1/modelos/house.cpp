@@ -12,7 +12,7 @@ House::House( Vetor3D tn, Vetor3D an, Vetor3D sn ) : MyObject( 3 ){
     origem = false;
 }
 
-//void House::desenha( float height , float width, float depth, bool origin ){
+
 void House::desenha( ){
     origem = true;
 
@@ -114,6 +114,13 @@ void House::desenha( ){
             glVertex3f( 0.9,    0,  0.9);
         glEnd();
 
+    glPopMatrix();
+
+    glPushMatrix();
+        if( selected ){
+            GUI::setColor(0,0,0.9,  0.35 );
+            GUI::drawBox( -0.99,0.005,-1,  0.99,1.765,1 );
+        }
     glPopMatrix();
 }
 
