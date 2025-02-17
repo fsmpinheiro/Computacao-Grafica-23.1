@@ -3,16 +3,16 @@
 
 #include "myobject.h"
 
-
 class Reservatory : public MyObject{
 
 public:
+    Reservatory();
+    Reservatory( Vetor3D tn, Vetor3D rn, Vetor3D sn );
 
-    Reservatory( );
-    Reservatory( Vetor3D tn, Vetor3D an, Vetor3D sn );
-    ~Reservatory( );
+    ~Reservatory();
 
-    void desenha( );
+    void desenha();
+    void unSelect();
 };
 
 #endif // RESERVATORY_H

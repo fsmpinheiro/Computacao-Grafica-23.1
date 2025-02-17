@@ -18,7 +18,7 @@ class GUI {
         mouseButtonFunction mouseButton;
 
     public:
-        GUI( int width, int height, displayFunction dFunction = glutGUI::defaultDisplay, keyFunction kFunction = glutGUI::defaultKey, mouseButtonFunction mbFunction = glutGUI::defaultMouseButton, const char *title = "GLUT" );
+        GUI( int width, int height, displayFunction dFunction = glutGUI::defaultDisplay, keyFunction kFunction = glutGUI::defaultKey, mouseButtonFunction mbFunction = glutGUI::mouseButton, const char *title = "GLUT" );
         void GLUTInit();
         void GLInit();
         ~GUI();
@@ -68,6 +68,13 @@ class GUI {
         //-------------------viewPorts------------------
         static void glScissoredViewport(int x, int y, int width, int height);
         //-------------------viewPorts------------------
+
+        //-------------------textures------------------
+        static void loadTextures();
+        static void habilitaTextura(bool renderTexture, bool texture_automatic, int texture_mode);
+        static void selecionaTextura(int texture_id);
+        static void desabilitaTextura(bool renderTexture, bool texture_automatic);
+        //-------------------textures------------------
 
         static void drawSphere(float x, float y, float z, float radius);
         static void drawQuad(float width = 5.0, float height = 5.0, float discrWidth = 0.3, float discrHeight = 0.3, float texWidth = 5.0, float texHeight = 5.0, bool inverted = false);

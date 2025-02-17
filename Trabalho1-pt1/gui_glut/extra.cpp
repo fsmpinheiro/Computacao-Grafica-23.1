@@ -49,7 +49,12 @@ bool glutGUI::multiple_viewports = false;
 
 bool glutGUI::draw_eixos = true;
 
+    // Transformações de objetos
 bool glutGUI::trans_obj = false;
+bool glutGUI::enable_translate = false;
+bool glutGUI::enable_rotate = false;
+bool glutGUI::enable_scale = false;
+bool glutGUI::enable_shear = false;
 
 float glutGUI::tx = 0.0;
 float glutGUI::ty = 0.0;
@@ -82,8 +87,7 @@ float glutGUI::dsz = 0.0;
 //float glutGUI::delta = 5.0;
 
 
-void glutGUI::resize(int w, int h)
-{
+void glutGUI::resize(int w, int h){
     //glutGUI::width = w;
     //glutGUI::height = h;
     width = w;
@@ -114,6 +118,7 @@ void glutGUI::defaultDisplay() {
     //LIGHT0
         //habilita luz
         glEnable(GL_LIGHT0);
+
         //definindo intensidades de cor da luz
         GLfloat light_ambient[]  = { 0.2f, 0.2f, 0.2f, 1.0f };
         GLfloat light_diffuse[]  = { 0.7f, 0.7f, 0.7f, 1.0f };
@@ -121,9 +126,11 @@ void glutGUI::defaultDisplay() {
         glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
         glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
         glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+
         //posicionando a luz
         GLfloat light_position[] = { 0.0f, 1.0f, 0.0f, 1.0f };
         glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
         //desenha uma esfera representando a luz
         glDisable(GL_LIGHTING);
         glColor4f(1.0,1.0,1.0,1.0);
@@ -195,89 +202,105 @@ void glutGUI::changeCam()
         glutGUI::perspective = true;
         glutGUI::pontosDeFuga = false;
         cam = new CameraDistante(); //CameraDistante(0,1,10, 0,1,0, 0,1,0);
+        cout << ("cam: 0; perspective true; pontosDeFuga false \n");
         break;
     case 1:
         glutGUI::perspective = false;
         glutGUI::ortho = true;
         cam = new CameraDistante(0,1,5, 0,1,0, 0,1,0);
+        cout << ("cam: 1; perspective false; ortho true \n");
         break;
     case 2:
         glutGUI::perspective = false;
         glutGUI::ortho = true;
         cam = new CameraDistante(5,1,0, 0,1,0, 0,1,0);
         //cam = new CameraDistante(5,0,0, 0,0,0, 0,1,-1);
+        cout << ("cam: 2; perspective false; ortho true \n");
         break;
     case 3:
         glutGUI::perspective = false;
         glutGUI::ortho = true;
         cam = new CameraDistante(0,1,-5, 0,1,0, 0,1,0);
+        cout << ("cam: 3; perspective false; ortho true \n");
         break;
     case 4:
         glutGUI::perspective = false;
         glutGUI::ortho = true;
         cam = new CameraDistante(-5,1,0, 0,1,0, 0,1,0);
+        cout << ("cam: 4; perspective false; ortho true \n");
         break;
     case 5:
         glutGUI::perspective = false;
         glutGUI::ortho = true;
         cam = new CameraDistante(0,6,0, 0,1,0, 0,0,-1);
+        cout << ("cam: 5; perspective false; ortho true \n");
         break;
     case 6:
         glutGUI::perspective = false;
         glutGUI::ortho = true;
-        cam = new CameraDistante(0,-4,0, 0,1,0, 0,0,1);
+        cam = new CameraDistante(6,7,10, 0,0,0, 0,1,0);
+        cout << ("cam: 6; perspective false; ortho true \n");
         break;
     case 7:
         glutGUI::perspective = false;
         glutGUI::ortho = true;
         cam = new CameraDistante(6,6,6, 0,0,0, 0,1,0);
+        cout << ("cam: 7; perspective false; ortho true \n");
         break;
     case 8:
         glutGUI::perspective = false;
         glutGUI::ortho = true;
         cam = new CameraDistante(6,3,6, 0,0,0, 0,1,0);
+        cout << ("cam: 8; perspective false; ortho true \n");
         break;
     case 9:
         glutGUI::perspective = false;
         glutGUI::ortho = true;
         cam = new CameraDistante(6,2,4, 0,0,0, 0,1,0);
+        cout << ("cam: 9; perspective false; ortho true \n");
         break;
     case 10:
         glutGUI::perspective = false;
         glutGUI::ortho = false;
         cam = new CameraDistante(-2,3,5, -2,3,0, 0,1,0);
+        cout << ("cam: 10; perspective false; ortho false \n");
         break;
     case 11:
         glutGUI::perspective = true;
         glutGUI::pontosDeFuga = true;
         cam = new CameraDistante(0,1,1.5, 0,1,0, 0,1,0);
+        cout << ("cam: 11; perspective true; ortho false; pontosDeFuga true \n");
         break;
     case 12:
         glutGUI::perspective = true;
         glutGUI::pontosDeFuga = true;
         cam = new CameraDistante(1.2,0.5,1.2, 0,0.5,0, 0,1,0);
+        cout << ("cam: 12; perspective true; ortho false; pontosDeFuga true \n");
         break;
     case 13:
         glutGUI::perspective = true;
         glutGUI::pontosDeFuga = true;
         cam = new CameraDistante(0.5,1.2,1.2, 0.5,0.5,0, 0,1,0);
+        cout << ("cam: 13; perspective true; ortho false; pontosDeFuga true \n");
         break;
     case 14:
         glutGUI::perspective = true;
         glutGUI::pontosDeFuga = true;
         cam = new CameraDistante(1.2,0.2,1.2, 0,1,0, 0,1,0);
+        cout << ("cam: 14; perspective true; ortho false; pontosDeFuga true \n");
         break;
     case 15:
         glutGUI::perspective = true;
         glutGUI::pontosDeFuga = false;
         cam = new CameraDistante(savedCamera[0],savedCamera[1],savedCamera[2],savedCamera[3],savedCamera[4],savedCamera[5],savedCamera[6],savedCamera[7],savedCamera[8]);
+        cout << ("cam: 15; perspective true; ortho false; pontosDeFuga false \n");
         break;
     }
     orthof = 0.00025*(cam->c - cam->e).modulo();
 }
 
-void glutGUI::defaultKey(unsigned char key, int x, int y)
-{
+void glutGUI::defaultKey(unsigned char key, int x, int y){
+
     switch (key)
     {
     case 27 :
@@ -286,24 +309,22 @@ void glutGUI::defaultKey(unsigned char key, int x, int y)
         exit(0);
         break;
 
-    case 'F':
-        glutFullScreen();
-        break;
-    case 'f':
-        glutReshapeWindow(800,600);
-        break;
-
-    case 'o':
-        glutGUI::perspective = !glutGUI::perspective;
-        break;
-    case 'O':
-        glutGUI::ortho = !glutGUI::ortho;
-        glutGUI::pontosDeFuga = !glutGUI::pontosDeFuga;
-        break;
-
-    //case 'l':
-    //    enabled_light[7] = !enabled_light[7];
+    //case 'F':
+    //    glutFullScreen();
     //    break;
+    //case 'f':
+    //    glutReshapeWindow(800,600);
+    //    break;
+
+//    case 'o':
+//        glutGUI::perspective = !glutGUI::perspective;
+//        break;
+//    case 'O':
+//        glutGUI::ortho = !glutGUI::ortho;
+//        glutGUI::pontosDeFuga = !glutGUI::pontosDeFuga;
+//        break;
+
+
     case '0'...'7':
         enabled_light[key-'0'] = !enabled_light[key-'0'];
         break;
@@ -317,11 +338,11 @@ void glutGUI::defaultKey(unsigned char key, int x, int y)
         posCam ++;
         changeCam();
         break;
-    case 'j':
-        posCam = 1;
-        delete cam;
-        cam = new CameraJogo(); //CameraDistante(0,1,5, 0,1,0, 0,1,0);
-        break;
+//    case 'j':
+//        posCam = 1;
+//        delete cam;
+//        cam = new CameraJogo();//CameraDistante(0,3,14, 0,1,0, 0,1,0); //CameraDistante(0,3,14, 0,1,0, 0,1,0);
+//        break;
     case 's':
         //save current camera location
         savedCamera[0] = cam->e.x;
@@ -430,7 +451,54 @@ void glutGUI::idle()
     glutPostRedisplay();
 }
 
+
 void glutGUI::defaultMouseButton(int button, int state, int x, int y) {
+    dtx = 0.0; dty = 0.0; dtz = 0.0;
+    dax = 0.0; day = 0.0; daz = 0.0;
+    dsx = 0.0; dsy = 0.0; dsz = 0.0;
+
+    // if the left button is pressed
+    if (button == GLUT_LEFT_BUTTON) {
+        // when the button is pressed
+        if (state == GLUT_DOWN) {
+            lbpressed = true;
+            //            //picking
+            //            int pick = picking( x, y, 5, 5 );
+            //            if (pick == 0)
+            //              lbpressed = true;
+            //            else
+            //              objeto_selecionado = pick;
+        } else {// state = GLUT_UP
+            lbpressed = false;
+        }
+    }
+    // if the middle button is pressed
+    if (button == GLUT_MIDDLE_BUTTON) {
+        // when the button is pressed
+        if (state == GLUT_DOWN) {
+            mbpressed = true;
+        } else {// state = GLUT_UP
+            mbpressed = false;
+        }
+    }
+    // if the left button is pressed
+    if (button == GLUT_RIGHT_BUTTON) {
+        // when the button is pressed
+        if (state == GLUT_DOWN) {
+            rbpressed = true;
+            //picking
+            //            objeto_selecionado = 0;
+        } else {// state = GLUT_UP
+            rbpressed = false;
+        }
+    }
+
+    last_x = x;
+    last_y = y;
+}
+
+
+void glutGUI::mouseButton(int button, int state, int x, int y) {
     dtx = 0.0; dty = 0.0; dtz = 0.0;
     dax = 0.0; day = 0.0; daz = 0.0;
     dsx = 0.0; dsy = 0.0; dsz = 0.0;
@@ -486,6 +554,13 @@ void glutGUI::defaultMouseButton(int button, int state, int x, int y) {
 //botao meio            bt esq e meio
 //horiz      vert       vert
 //dsx = 0.0; dsy = 0.0; dsz = 0.0;
+
+//void glutGUI::mouseMoveTransform(int x, int y){
+//    if (mouse_lock == ONLY_X ) last_y = y;
+//    if (mouse_lock == ONLY_Y ) last_x = x;
+
+//}
+
 void glutGUI::mouseMove(int x, int y) {
     if ( mouse_lock == ONLY_X ) last_y = y;
     if ( mouse_lock == ONLY_Y ) last_x = x;
@@ -494,81 +569,137 @@ void glutGUI::mouseMove(int x, int y) {
     dax = 0.0; day = 0.0; daz = 0.0;
     dsx = 0.0; dsy = 0.0; dsz = 0.0;
 
-    float fator = 10.0;
-    if (lbpressed && !rbpressed && !mbpressed) {
-        if (!trans_obj && (!trans_luz || !obj_transp)) {
+    float fator = 1.0;
+
+    if( lbpressed && !rbpressed && !mbpressed ){
+        if ( !trans_obj && (!trans_luz || !obj_transp) ) {
             cam->rotatex(y,last_y);
             cam->rotatey(x,last_x);
         }
-        if (trans_obj) {
-            dax = (y - last_y)/fator;
-            day = (x - last_x)/fator;
-            ax += dax;
-            ay += day;
+
+        if( trans_obj ){
+            //Translations
+            if( enable_translate && !enable_rotate && !enable_scale && !enable_shear){ //Trns em X
+                fator = 30.0;
+                dtx = (x - last_x)/fator;
+                tx += dtx;
+            }
+            //Rotations
+            if( !enable_translate && enable_rotate && !enable_scale  && !enable_shear){ //Rot em X
+                fator = 4.0;
+                dax = (y - last_y)/fator;
+                ax += dax;
+            }
+            //Scale XandY
+            if( !enable_translate && !enable_rotate && enable_scale  && !enable_shear){ //Scal em XY
+                fator = 120;
+                dsx = (x - last_x)/fator;
+                dsy = -(y - last_y)/fator;
+                sx += dsx;
+                sy += dsy;
+            }
         }
-        if (trans_luz && obj_transp) {
-            fator = 100.0;
-            transparencia -= (y - last_y)/fator;
-            if (transparencia < 0.0) transparencia = 0.0;
-            if (transparencia > 1.0) transparencia = 1.0;
-        }
+
+
     }
-    fator = 100.0;
-    if (!lbpressed && rbpressed && !mbpressed) {
-        if (!trans_obj && !trans_luz) {
+
+    if( !lbpressed && rbpressed && !mbpressed){
+
+        if ( !trans_obj && !trans_luz ) {
             cam->translatex(x,last_x);
             cam->translatey(y,last_y);
         }
-        if (trans_obj) {
-            dtx = (x - last_x)/fator;
-            dty = -(y - last_y)/fator;
-            tx += dtx;
-            ty += dty;
-        }
-        if (trans_luz) {
+
+        if ( trans_luz ) {
+            fator = 150;
             lx += (x - last_x)/fator;
             ly += -(y - last_y)/fator;
         }
+
+        if( trans_obj ){
+            //Translations
+            if( enable_translate && !enable_rotate && !enable_scale && !enable_shear){ //Trn em Y
+                fator = 35.0;
+                dty = -(y - last_y)/fator;
+                ty += dty;
+            }
+            //Rotations
+            if( !enable_translate && enable_rotate && !enable_scale  && !enable_shear){ //Rot em Y
+                fator = 4.0;
+                day = (x - last_x)/fator;
+                ay += day;
+            }
+            //Scale Z
+            if( !enable_translate && !enable_rotate && enable_scale  && !enable_shear){ //Scal em Z
+                fator = 120;
+                dsz = (y - last_y)/fator;
+                sz += dsz;
+            }
+            //Shear XY
+            if( !enable_translate && !enable_rotate && !enable_scale  && enable_shear){
+                fator = 150;
+                dtx = (x - last_x)/fator;
+                dty = -(y - last_y)/fator;
+                tx += dtx;
+                ty += dty;
+            }
+        }
     }
-    if (lbpressed && rbpressed && !mbpressed) {
-        if (!trans_obj && !trans_luz) {
+
+    if( lbpressed && rbpressed && !mbpressed){
+        if ( !trans_obj && !trans_luz ) {
             cam->zoom(y,last_y);
-            //orthof += -(y - last_y)/50000.0;
-            orthof = 0.00025*(cam->c - cam->e).modulo();
-            //cam->rotatez(x,last_x);
         }
-        if (trans_obj) {
-            fator = 100.0;
-            dtz = (y - last_y)/fator;
-            tz += dtz;
-            fator = 10.0;
-            daz = -(x - last_x)/fator;
-            az += daz;
-        }
+
         if (trans_luz) {
-            fator = 100.0;
+            fator = 150.0;
             lz += (y - last_y)/fator;
             fator = 10.0;
             spot_angle += -(x - last_x)/fator;
         }
-    }
-    fator = 100.0;
-    if (!lbpressed && !rbpressed && mbpressed) {
-        if (!trans_obj) {
-        } else {
-            dsx = (x - last_x)/fator;
-            dsy = -(y - last_y)/fator;
-            sx += dsx;
-            sy += dsy;
+
+
+        if( trans_obj ){
+            //Translations
+            if( enable_translate && !enable_rotate && !enable_scale  && !enable_shear){ //Trn em Z
+                fator = 30.0;
+                dtz = (y - last_y)/fator;
+                tz += dtz;
+            }
+            //Rotations
+            if( !enable_translate && enable_rotate && !enable_scale  && !enable_shear){ //Rot em Z
+                fator = 4.0;
+                daz = (last_x - x )/fator;
+                az += daz;
+            }
+            //Scala simétrica em XYZ
+            if( !enable_translate && !enable_rotate && enable_scale  && !enable_shear){ //Scal em XYZ
+                fator = 80;
+                dsx = (x - last_x)/fator;
+                dsz = dsy = dsx;
+                sx += dsx;
+                sy += dsy;
+                sz += dsz;
+            }
         }
     }
-    if (lbpressed && !rbpressed && mbpressed) {
-        if (!trans_obj) {
-        } else {
-            dsz = (y - last_y)/fator;
-            sz += dsz;
-        }
-    }
+
+//    if ( lbpressed && !rbpressed && !mbpressed ) {
+
+//        if ( trans_luz && obj_transp ) {
+//            fator = 100.0;
+//            transparencia -= (y - last_y)/fator;
+//            if (transparencia < 0.0) transparencia = 0.0;
+//            if (transparencia > 1.0) transparencia = 1.0;
+//        }
+//    }
+
+//    if ( !lbpressed && rbpressed && !mbpressed ) {
+
+//    }
+//    if ( lbpressed && rbpressed && !mbpressed ) {
+
+//    }
 
     last_x = x;
     last_y = y;

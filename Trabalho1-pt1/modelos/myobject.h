@@ -6,21 +6,21 @@
 class MyObject{
 
 public:
-    Vetor3D t = Vetor3D(0, 0, 0);
-    Vetor3D a = Vetor3D(0, 0, 0);
-    Vetor3D s = Vetor3D(1, 1, 1);
+    Vetor3D trans = Vetor3D(0, 0, 0);
+    Vetor3D rotat = Vetor3D(0, 0, 0);
+    Vetor3D scale = Vetor3D(1, 1, 1);
+    Vetor3D shear = Vetor3D(0, 0, 0);
 
-    /*
-     *   se objeto carro.3DS: 1
-     *   se objeto cow.3Ds: 2
-     *   se objeto pre-modelado: 3
-     */
-    int tipo;
-    bool origem = true;
+    int kind;
+    bool origin = false;
     bool selected = false;
+    bool reflect = false;
+    //bool shear = false;
 
-    MyObject( int t );
+public:
+    MyObject( int k );
     virtual void desenha();
+
 };
 
 #endif // MYOBJECT_H

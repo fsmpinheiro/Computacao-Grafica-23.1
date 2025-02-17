@@ -1,5 +1,107 @@
 #include "gui.h"
 
+//-----Texturas---------
+//texture
+#include "OpenTextures.h"
+
+//texture
+bool renderTexture = true;
+GLuint tList[7]; // Array of 4 texture objects
+enum { GRANITO = 0, MARMORE, LADRILHO, REFRI, SKY, KICK_ASS, QUADRICULADO };
+int texture_id = 0;
+bool texture_automatic = false;
+enum { OBJECT = 0, EYE, SPHERE_MAP };
+int texture_mode = 0;
+
+// Texture ///////////////////////////////////////////////////////////
+//carrega inicialmente (apenas uma vez) as texturas dos arquivos
+void GUI::loadTextures() {
+
+    /* Initialization of DevIL */
+         if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION)
+         {
+               printf("wrong DevIL version \n");
+               return;
+         }
+         ilInit();
+
+
+    // Generate 7 texture object ID's
+    glGenTextures(7, tList);
+
+    glBindTexture(GL_TEXTURE_2D, tList[GRANITO]);
+    //carrega a imagem e seta parametros de mapeamento de textura
+    OT::loadTexture( "../textures/granito.bmp", true );
+
+    glBindTexture(GL_TEXTURE_2D, tList[MARMORE]);
+    //carrega a imagem e seta parametros de mapeamento de textura
+    OT::loadTexture( "../textures/marmore.bmp", true );
+
+    glBindTexture(GL_TEXTURE_2D, tList[LADRILHO]);
+    //carrega a imagem e seta parametros de mapeamento de textura
+    OT::loadTexture( "../textures/teto.jpg", true );
+
+    glBindTexture(GL_TEXTURE_2D, tList[REFRI]);
+    //carrega a imagem e seta parametros de mapeamento de textura
+    OT::loadTexture( "../textures/refri.bmp", true );
+
+    glBindTexture(GL_TEXTURE_2D, tList[SKY]);
+    //carrega a imagem e seta parametros de mapeamento de textura
+    OT::loadTexture( "../textures/sky.bmp", true );
+
+    glBindTexture(GL_TEXTURE_2D, tList[KICK_ASS]);
+    //carrega a imagem e seta parametros de mapeamento de textura
+    OT::loadTextureRAW( "../textures/kick_ass.raw", true );
+
+    glBindTexture(GL_TEXTURE_2D, tList[QUADRICULADO]);
+    //carrega a imagem e seta parametros de mapeamento de textura
+    OT::loadTexture( "../textures/quadriculado.bmp", true );
+}
+
+void GUI::habilitaTextura( bool renderTexture, bool texture_automatic, int texture_mode ) {
+    if ( renderTexture ) {
+      glEnable(GL_TEXTURE_2D);
+      if ( texture_automatic ) { //ignora as chamadas glTexCoord2f associadas aos glVertex3f (as coordenadas de textura sao calculadas automaticamente em tempo de execucao, acho que independente da geometria sendo desenhada)
+        glEnable(GL_TEXTURE_GEN_S);
+        glEnable(GL_TEXTURE_GEN_T);
+        //glEnable(GL_TEXTURE_GEN_R);
+        //glEnable(GL_TEXTURE_GEN_Q);
+          //GLfloat zPlane[] = { 0.0f, 0.0f, 1.0f, 0.0f };
+          if ( texture_mode == OBJECT ) {
+            glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+            glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+              //glTexGenfv(GL_S, GL_OBJECT_PLANE, zPlane);
+              //glTexGenfv(GL_T, GL_OBJECT_PLANE, zPlane);
+          } else if ( texture_mode == EYE ) {
+            glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+            glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+              //glTexGenfv(GL_S, GL_EYE_PLANE, zPlane);
+              //glTexGenfv(GL_T, GL_EYE_PLANE, zPlane);
+          } else { //if ( texture_mode == SPHERE_MAP ) {
+            glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP); //GL_OBJECT_LINEAR, GL_EYE_LINEAR, GL_SPHERE_MAP, GL_NORMAL_MAP, GL_REFLECTION_MAP
+            glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+          }
+      }
+    }
+}
+
+void GUI::selecionaTextura( int texture_id ) {
+    glBindTexture( GL_TEXTURE_2D, tList[texture_id] );
+}
+
+void GUI::desabilitaTextura( bool renderTexture, bool texture_automatic ) {
+    if ( renderTexture ) {
+      glDisable(GL_TEXTURE_2D);
+      if ( texture_automatic ) {
+        glDisable(GL_TEXTURE_GEN_S);
+        glDisable(GL_TEXTURE_GEN_T);
+        //glDisable(GL_TEXTURE_GEN_R);
+        //glDisable(GL_TEXTURE_GEN_Q);
+      }
+    }
+}
+//-----Texturas---------
+
 GUI::GUI(int width, int height, displayFunction dFunction, keyFunction kFunction, mouseButtonFunction mbFunction, const char *title) {
     wTitle = title;
     wWidth = width;
@@ -11,6 +113,8 @@ GUI::GUI(int width, int height, displayFunction dFunction, keyFunction kFunction
     GLUTInit();
 
     GLInit();
+
+    loadTextures();
 
     glutMainLoop();
 }
@@ -35,8 +139,9 @@ void GUI::GLUTInit()
 
 void GUI::GLInit()
 {
-    glClearColor(0.6,0.6,0.0,1.0); //define a cor para limpar a imagem (cor de fundo)
-    //glClearColor(1.0,1.0,1.0,1.0); //define a cor para limpar a imagem (cor de fundo)
+//    glClearColor(0.6,0.6,0.0,1.0); //define a cor para limpar a imagem (cor de fundo)
+    //glClearColor(0.6,0.6,0.6,1.0); //define a cor para limpar a imagem (cor de fundo)
+    glClearColor(0.5,0.7,0.35,1.0); //define a cor para limpar a imagem (cor de fundo)
 
     glEnable(GL_LIGHTING); //habilita iluminacao (chamada no setLight)
     //glEnable(GL_COLOR_MATERIAL);
@@ -92,8 +197,8 @@ void GUI::setMouseButton(mouseButtonFunction mbFunction)
 
 //using namespace glutGUI;
 
-void GUI::displayInit()
-{
+void GUI::displayInit(){
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a imagem com a cor de fundo
 
     const float ar = glutGUI::height>0 ? (float) glutGUI::width / (float) glutGUI::height : 1.0;
@@ -166,7 +271,7 @@ void GUI::keyInit(unsigned char key, int x, int y)
 
 void GUI::mouseButtonInit(int button, int state, int x, int y)
 {
-    glutGUI::defaultMouseButton(button,state,x,y);
+    glutGUI::mouseButton(button,state,x,y);
 }
 
 void GUI::setLight(int id, float posx, float posy, float posz, bool onOffKeyDefault, bool attenuated, bool low, bool hidden, bool pontual, bool spot, bool onOffUserControl) {
@@ -174,9 +279,11 @@ void GUI::setLight(int id, float posx, float posy, float posz, bool onOffKeyDefa
     glutGUI::hidden_light[id] = hidden;
     glutGUI::pontual_light[id] = pontual;
     glutGUI::spot_light[id] = spot;
+
     //habilita/desabilita luz
     if (glutGUI::iluminacao && glutGUI::enabled_light[id]) glEnable(GL_LIGHT0+id);
     else glDisable(GL_LIGHT0+id);
+
     //definindo intensidades de cor da luz
     GLfloat light_ambient[]  = { 0.2f, 0.2f, 0.2f, 1.0f };
     GLfloat light_diffuse[]  = { 0.7f, 0.7f, 0.7f, 1.0f };
@@ -189,10 +296,12 @@ void GUI::setLight(int id, float posx, float posy, float posz, bool onOffKeyDefa
     glLightfv(GL_LIGHT0+id, GL_AMBIENT,  light_ambient);
     glLightfv(GL_LIGHT0+id, GL_DIFFUSE,  light_diffuse);
     glLightfv(GL_LIGHT0+id, GL_SPECULAR, light_specular);
+
     //posicionando a luz
     GLfloat light_position[] = { posx + glutGUI::lx, posy + glutGUI::ly, posz + glutGUI::lz, 1.0f }; //4o parametro: 0.0 - luz no infinito, 1.0 - luz pontual
         if (!glutGUI::pontual_light[id]) light_position[3] = 0.0f;
     glLightfv(GL_LIGHT0+id, GL_POSITION, light_position);
+
     //desenha uma esfera representando a luz
     if (glutGUI::iluminacao && glutGUI::enabled_light[id] && !glutGUI::hidden_light[id]) {
         glDisable(GL_LIGHTING);
@@ -203,6 +312,7 @@ void GUI::setLight(int id, float posx, float posy, float posz, bool onOffKeyDefa
         glPopMatrix();
         glEnable(GL_LIGHTING);
     }
+
     //desenha uma linha do (0,0,0) ate a posicao da luz
     if (glutGUI::iluminacao && glutGUI::enabled_light[id] && glutGUI::trans_luz) {
         glDisable(GL_LIGHTING);
@@ -213,6 +323,7 @@ void GUI::setLight(int id, float posx, float posy, float posz, bool onOffKeyDefa
         glEnd();
         glEnable(GL_LIGHTING);
     }
+
     //spot_light
     if (glutGUI::spot_light[id]) {
         const GLfloat light_direction[] = { 0.0f, 0.0f, -1.0f, 1.0f }; //{ -(2.0f + lx), -(5.0f + ly), -(5.0f + lz), 1.0f };
@@ -221,6 +332,7 @@ void GUI::setLight(int id, float posx, float posy, float posz, bool onOffKeyDefa
     } else {
         glLightf(GL_LIGHT0+id, GL_SPOT_CUTOFF, 180.0);
     }
+
     //attenuation
     if (attenuated) {
         glLightf(GL_LIGHT0+id, GL_CONSTANT_ATTENUATION, 2.0);
@@ -490,13 +602,13 @@ int GUI::processHits( GLint hits, GLuint buffer[] ) {
   GLuint names, *ptr, minZ,*ptrNames, numberOfNames;
 
   ptrNames = NULL;
-
-  printf("Hits = %d\n",hits);
-  printf("Buffer = ");
-  for (i = 0; i < 4*hits; i++) {
-    printf("%u ",buffer[i]);
-  }
-  printf("\n");
+    //print hits in prompt
+//  printf("Hits = %d\n",hits);
+//  printf("Buffer = ");
+//  for (i = 0; i < 4*hits; i++) {
+//    printf("%u ",buffer[i]);
+//  }
+//  printf("\n");
 
   ptr = (GLuint *) buffer;
   minZ = 0xffffffff;

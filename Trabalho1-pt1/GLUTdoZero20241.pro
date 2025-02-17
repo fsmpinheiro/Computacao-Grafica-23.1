@@ -5,8 +5,9 @@ CONFIG -= qt
 
 INCLUDEPATH += bib
 INCLUDEPATH += gui_glut
+INCLUDEPATH += trab1
 
-LIBS += -lGL -lGLU -lglut -l3ds -lSDL_image
+LIBS += -lGL -lGLU -lglut -l3ds -lSDL_image -lIL
 
 SOURCES += main.cpp \
     bib/Camera.cpp \
@@ -17,12 +18,13 @@ SOURCES += main.cpp \
     bib/Vetor3D.cpp \
     gui_glut/extra.cpp \
     gui_glut/gui.cpp \
-    modelos/house.cpp \
+    gui_glut/OpenTextures.cpp \
     modelos/myobject.cpp \
-    modelos/carr.cpp \
-    Controller/controllersys.cpp \
-    modelos/cow.cpp
-
+    modelos/reservatory.cpp \
+    modelos/carro.cpp \
+    modelos/casa.cpp \
+    modelos/cow.cpp \
+    modelos/pinheiro.cpp
 
 HEADERS += \
     bib/Camera.h \
@@ -33,8 +35,10 @@ HEADERS += \
     bib/Vetor3D.h \
     gui_glut/extra.h \
     gui_glut/gui.h \
-    modelos/house.h \
+    gui_glut/OpenTextures.h \
     modelos/myobject.h \
-    modelos/carr.h \
-    Controller/controllersys.h \
-    modelos/cow.h
+    modelos/reservatory.h \
+    modelos/carro.h \
+    modelos/casa.h \
+    modelos/cow.h \
+    modelos/pinheiro.h

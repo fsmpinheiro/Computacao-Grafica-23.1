@@ -104,7 +104,8 @@ void Model3DS::newList(Lib3dsMesh *mesh, bool colorido)
 
 #else /* USE_SDL */
                             pt->bitmap = NULL;
-                            fputs("3dsplayer: Warning: No image loading support, skipping texture.\n", stderr);
+                    // comentado pra diminir erros no prompt
+                            //fputs("3dsplayer: Warning: No image loading support, skipping texture.\n", stderr);
 #endif /* USE_SDL */
                             if (pt->bitmap) {	/* could image be loaded ? */
                                 /* this OpenGL texupload code is incomplete format-wise!
@@ -151,10 +152,11 @@ void Model3DS::newList(Lib3dsMesh *mesh, bool colorido)
                                 pt->valid = 1;
                             }
                             else {
-                                fprintf(stderr,
-                                        "Load of texture %s did not succeed "
-                                        "(format not supported !)\n",
-                                        texname);
+                                // comentado pra diminir erros no prompt
+//                                fprintf(stderr,
+//                                        "Load of texture %s did not succeed "
+//                                        "(format not supported !)\n",
+//                                        texname);
                                 pt->valid = 0;
                             }
                         }

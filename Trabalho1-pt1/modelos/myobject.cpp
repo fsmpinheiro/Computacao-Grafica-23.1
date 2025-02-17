@@ -1,20 +1,19 @@
 #include "myobject.h"
 
-MyObject::MyObject( int t ){
-    tipo = t;
+MyObject::MyObject( int k ){
+    kind = k;
 }
-
 
 void MyObject::desenha( ){
 
-    glTranslatef( t.x, t.y, t.z );
-    glRotatef( a.z,  0, 0, 1 );
-    glRotatef( a.y,  0, 1, 0 );
-    glRotatef( a.x,  1, 0, 0 );
+    glTranslatef( trans.x, trans.y, trans.z );
+    glRotatef( rotat.z, 0, 0, 1);
+    glRotatef( rotat.y, 0, 1, 0);
+    glRotatef( rotat.x, 1, 0, 0);
 
-    if( origem ){
-        GUI::drawOrigin( 1 );
-    }
+//    if( origin ){
+//        GUI::drawOrigin( 0.5 );
+//    }
 
-    glScalef( s.x, s.y, s.z );
+    glScalef( scale.x, scale.y, scale.z );
 }

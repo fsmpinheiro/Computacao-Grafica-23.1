@@ -79,7 +79,12 @@ public:
 
     static bool draw_eixos;// = true;
 
-    static bool trans_obj;// = false;
+        // Transformações de objetos
+    static bool trans_obj;        // = false;
+    static bool enable_translate; // = false;
+    static bool enable_rotate;    // = false;
+    static bool enable_scale;     // = false;
+    static bool enable_shear;     // = false;
 
     static float tx;// = 0.0;
     static float ty;// = 0.0;
@@ -109,6 +114,18 @@ public:
     static float dsy;// = 0.0;
     static float dsz;// = 0.0;
 
+    static float drx;// = 0.0;
+    static float dry;// = 0.0;
+    static float dlry;// = 0.0;
+
+    static float dly;// = 0.0;
+    static float dlx;// = 0.0;
+    static float dlrx;// = 0.0;
+
+    static float dmx;// = 0.0;
+    static float dmy;// = 0.0;
+    static float dlmy;// = 0.0;
+
     //static float delta;// = 5.0;
 
 public:
@@ -120,6 +137,7 @@ public:
     static void autoCamMotion(float value, Axis axis, int nIterations = 10);
     static void idle(void);
     static void defaultMouseButton(int button, int state, int x, int y);
+    static void mouseButton(int button, int state, int x, int y);
     static void mouseMove(int x, int y);
 
     static void multGLMatrixByVector(float res[], float matriz[], float entr[]);
@@ -127,6 +145,8 @@ public:
     static void composite();
     static void showLocalAndGlobalCoords(float pl[]);
     static Vetor3D transformedPoint(Vetor3D p, transformFunction transformGL);
+
+    void mouseMoveTransform(int x, int y);
 };
 
 #endif // EXTRA_H

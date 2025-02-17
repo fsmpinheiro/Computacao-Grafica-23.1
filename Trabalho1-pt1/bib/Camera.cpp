@@ -7,8 +7,8 @@ Camera::Camera()
   u = Vetor3D();
 
   e.x=0;
-  e.y=1;
-  e.z=10;
+  e.y=4;    // 1
+  e.z=12.5; // 10
 
   c.x=0;
   c.y=1;

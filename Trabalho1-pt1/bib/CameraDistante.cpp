@@ -82,7 +82,13 @@ void CameraDistante::rotatey(GLfloat new_x, GLfloat last_x){
   //x local
   Vetor3D x_ = u ^ Vce; //x_
   !x_; //normaliza (torna unitario)
-  e = e + ( x_ * ( ((1.0/30.0)*Dce)*(last_x - new_x)/5.0 ) );
+
+  //novo-----------------------------------
+  //tratando o caso quando está olhando de cima
+  float fator = u*Vetor3D(0,1,0);
+  //fim_novo-------------------------------
+
+  e = e + ( x_ * ( ((1.0/30.0)*Dce*fator)*(last_x - new_x)/5.0 ) );
   //mantendo distancia (raio/rotacao) consistente
   //vetor do centro(center) ao novo olho(eye)
   Vce = e - c;
