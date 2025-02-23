@@ -23,7 +23,9 @@ void Reservatory::desenha( ){
             GUI::drawOrigin( 0.5);
 
         if( reflect ){
-            GUI::glReflectPlaneXYf();
+            //GUI::glReflectPlaneXYf();
+            glTranslatef(0,3.5,0);
+            GUI::glReflectPlaneXZf();
         }
 
         GUI::setColor( 0.8,  0.8,    0.8);
