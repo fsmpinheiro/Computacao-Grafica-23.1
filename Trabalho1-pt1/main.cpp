@@ -7,6 +7,7 @@
 using namespace std;
 
 #include <gui.h>
+#include <OpenTextures.h>
 #include <modelos/myobject.h>
 #include <modelos/carro.h>
 #include <modelos/casa.h>
@@ -34,7 +35,6 @@ bool pontLight = true, spotLight = false;
 bool drawShadow = false;
 float k_shadow = 0.0019;
 
-
 //-------------------picking------------------
 bool enable_pick = false;
 
@@ -44,34 +44,100 @@ bool enable_pick = false;
 //int pontoSelecionado = 0;
 
 
+
+
 void loadBasicScenario(){        //objetos fixos do cenário
     //Objetos fixos no cenário (fora do vetor interativo)
 
     //chão-estradas
     glPushMatrix();
-        float posEstradaY = 0.001;
-        glBegin(GL_POLYGON);        // eixo x
-        glNormal3f(0,1,0);
-        GUI::setColor(0.4, 0.5, 0.5,1, true);
-            glVertex3f(-3.89, posEstradaY, -0.65);
-            glVertex3f(-3.89, posEstradaY,  0.65);
-            glVertex3f( 3.89, posEstradaY,  0.65);
-            glVertex3f( 3.89, posEstradaY, -0.65);
-        glEnd();
-        glBegin(GL_POLYGON);        // eixo y_-z
-        //glNormal3f(0,1,0);
-            //GUI::setColor(0.4, 0.5, 0.5);
-            glVertex3f(-0.4,  posEstradaY, -3.95);
-            glVertex3f(-0.4,  posEstradaY, -0.658);
-            glVertex3f( 0.68, posEstradaY, -0.658);
-            glVertex3f( 0.68, posEstradaY, -3.95);
-        glEnd();
-        glBegin(GL_POLYGON);        // eixo y_+z
-            glVertex3f(-0.4,  posEstradaY, 0.658);
-            glVertex3f(-0.4,  posEstradaY, 3.95);
-            glVertex3f( 0.68, posEstradaY, 3.95);
-            glVertex3f( 0.68, posEstradaY, 0.658);
-        glEnd();
+    float posEstradaY = 0.001;
+            glBegin(GL_POLYGON);        // eixo x
+            glNormal3f(0,1,0);
+            GUI::setColor(0.4, 0.5, 0.5,1, true);
+                glVertex3f(-3.89, posEstradaY, -0.65);
+                glVertex3f(-3.89, posEstradaY,  0.65);
+                glVertex3f( 3.89, posEstradaY,  0.65);
+                glVertex3f( 3.89, posEstradaY, -0.65);
+            glEnd();
+            glBegin(GL_POLYGON);        // eixo y_-z
+            //glNormal3f(0,1,0);
+                //GUI::setColor(0.4, 0.5, 0.5);
+                glVertex3f(-0.4,  posEstradaY, -3.95);
+                glVertex3f(-0.4,  posEstradaY, -0.658);
+                glVertex3f( 0.68, posEstradaY, -0.658);
+                glVertex3f( 0.68, posEstradaY, -3.95);
+            glEnd();
+            glBegin(GL_POLYGON);        // eixo y_+z
+                glVertex3f(-0.4,  posEstradaY, 0.658);
+                glVertex3f(-0.4,  posEstradaY, 3.95);
+                glVertex3f( 0.68, posEstradaY, 3.95);
+                glVertex3f( 0.68, posEstradaY, 0.658);
+            glEnd();
+
+
+
+//-------------------textures------------------
+    //    chão da floresta   (textura LEAVES)
+        GUI::habilitaTextura(true, false, 0);
+        GUI::selecionaTextura( 5 );     // int entre 0 ~ 6
+    //    glDisable(GL_CULL_FACE);
+
+        const GLfloat lightGreenMaterial[]={0.4, 0.5, 0.3, 0.7};
+        glMaterialfv(GL_FRONT, GL_AMBIENT, lightGreenMaterial);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, lightGreenMaterial);
+
+        float dim_texture = 3.0;
+        glPushMatrix();
+            glBegin( GL_QUADS );
+            glNormal3f(0.,1.,0.);
+                glTexCoord2f(         0.0f,        0.0f);
+                    glVertex3f(  0.8, posEstradaY, 1.3);
+
+                glTexCoord2f( 2 * dim_texture,        0.0f);
+                    glVertex3f(  0.8, posEstradaY, 4.95);
+
+                glTexCoord2f( 1 * dim_texture, dim_texture);
+                    glVertex3f(  5.65, posEstradaY, 4.95);
+
+                glTexCoord2f(            0.0f, dim_texture);
+                    glVertex3f(  5.65, posEstradaY, 1.3);
+
+            glEnd();
+        glPopMatrix();
+    //    glEnable(GL_CULL_FACE);
+        GUI::desabilitaTextura(true, false);
+
+    //    chão da casa   (textura STONEWALL)
+        GUI::habilitaTextura(true, false, 0);
+        GUI::selecionaTextura( 2 );     // int entre 0 ~ 6
+    //    glDisable(GL_CULL_FACE);
+
+        const GLfloat lightGreenMaterial2[]={0.7, 0.7, 0.7, 0.7};
+        glMaterialfv(GL_FRONT, GL_AMBIENT, lightGreenMaterial2);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, lightGreenMaterial2);
+
+        float dim_texture2 = 3.0;
+        glPushMatrix();
+            glBegin( GL_QUADS );
+            glNormal3f(0.,1.,0.);
+                glTexCoord2f( 1*dim_texture2, 0*dim_texture2);
+                    glVertex3f(  -0.8, posEstradaY, -0.8);
+
+                glTexCoord2f( 1*dim_texture2, 2.0f);
+                    glVertex3f(  -0.8, posEstradaY, -4.90);
+
+                glTexCoord2f( 0*dim_texture2, 2.0f);
+                    glVertex3f(  -5.65, posEstradaY, -4.90);
+
+                glTexCoord2f( 0*dim_texture2, 0*dim_texture2);
+                    glVertex3f(  -5.65, posEstradaY, -0.8);
+
+            glEnd();
+        glPopMatrix();
+    //    glEnable(GL_CULL_FACE);
+        GUI::desabilitaTextura(true, false);
+
 
     glPopMatrix();
 
@@ -134,6 +200,7 @@ int picking( GLint cursorX, GLint cursorY, int w, int h ){
 }
 
 //-------------------picking------------------
+
 //-------------------mouse button------------------
 void mouseButtonMain(int button, int state, int x, int y){
     glutGUI::dtx = 0.0; glutGUI::dty = 0.0; glutGUI::dtz = 0.0;

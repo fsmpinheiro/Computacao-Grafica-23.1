@@ -23,8 +23,8 @@ ILuint OpenTextures::LoadImage(const char *filename)
     ILboolean success;
     ILuint image;
 
-    ilGenImages(1, &image); /* Generation of one image name */
-    ilBindImage(image); /* Binding of image name */
+    ilGenImages(1, &image);         /* Generation of one image name */
+    ilBindImage(image);             /* Binding of image name */
     success = ilLoadImage(filename); /* Loading of the image filename by DevIL */
 
     if (success) /* If no error occured: */

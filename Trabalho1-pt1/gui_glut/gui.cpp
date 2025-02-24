@@ -8,7 +8,7 @@
 //texture
 bool renderTexture = true;
 GLuint tList[7]; // Array of 4 texture objects
-enum { GRANITO = 0, MARMORE, LADRILHO, REFRI, SKY, KICK_ASS, QUADRICULADO };
+enum { GRANITO = 0, MARMORE, LADRILHO, REFRI, SKY, LEAVESS, STONEWALL };
 int texture_id = 0;
 bool texture_automatic = false;
 enum { OBJECT = 0, EYE, SPHERE_MAP };
@@ -32,31 +32,32 @@ void GUI::loadTextures() {
 
     glBindTexture(GL_TEXTURE_2D, tList[GRANITO]);
     //carrega a imagem e seta parametros de mapeamento de textura
-    OT::loadTexture( "../textures/granito.bmp", true );
+    OT::loadTexture( "../textures/0_granito.bmp", true );
 
     glBindTexture(GL_TEXTURE_2D, tList[MARMORE]);
     //carrega a imagem e seta parametros de mapeamento de textura
-    OT::loadTexture( "../textures/marmore.bmp", true );
+    OT::loadTexture( "../textures/1_marmore.bmp", true );
 
     glBindTexture(GL_TEXTURE_2D, tList[LADRILHO]);
     //carrega a imagem e seta parametros de mapeamento de textura
-    OT::loadTexture( "../textures/teto.jpg", true );
+    OT::loadTexture( "../textures/2_ladrilho.bmp", true );
 
     glBindTexture(GL_TEXTURE_2D, tList[REFRI]);
     //carrega a imagem e seta parametros de mapeamento de textura
-    OT::loadTexture( "../textures/refri.bmp", true );
+    OT::loadTexture( "../textures/3_refri.bmp", true );
 
     glBindTexture(GL_TEXTURE_2D, tList[SKY]);
     //carrega a imagem e seta parametros de mapeamento de textura
-    OT::loadTexture( "../textures/sky.bmp", true );
+    OT::loadTexture( ".../textures/sky.bmp", true );
 
-    glBindTexture(GL_TEXTURE_2D, tList[KICK_ASS]);
+    glBindTexture(GL_TEXTURE_2D, tList[LEAVESS]);
     //carrega a imagem e seta parametros de mapeamento de textura
-    OT::loadTextureRAW( "../textures/kick_ass.raw", true );
+    OT::loadTexture( "../textures/5_darklucyleaves.jpg", true );
 
-    glBindTexture(GL_TEXTURE_2D, tList[QUADRICULADO]);
+    glBindTexture(GL_TEXTURE_2D, tList[STONEWALL]);
     //carrega a imagem e seta parametros de mapeamento de textura
-    OT::loadTexture( "../textures/quadriculado.bmp", true );
+    OT::loadTextureRAW( "../textures/6_stonewall.jpg", true );
+
 }
 
 void GUI::habilitaTextura( bool renderTexture, bool texture_automatic, int texture_mode ) {
