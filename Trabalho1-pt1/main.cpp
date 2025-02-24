@@ -25,6 +25,7 @@ int objsVectorSize = 0;
 
 bool isFullScreen = false;
 int windWidth = 1200, windHeight = 700; //render window dimensions
+bool enable_viewport = false;
 
 //-------------------iluminação-------------------
 bool pontLight = true, spotLight = false;
@@ -36,8 +37,9 @@ float k_shadow = 0.0019;
 
 //-------------------picking------------------
 bool enable_pick = false;
-bool picked = false;
-vector <Vetor3D> pontosDeControle;
+
+//bool picked = false;
+//vector <Vetor3D> pontosDeControle;
 
 //int pontoSelecionado = 0;
 
@@ -190,14 +192,25 @@ void mouseButtonMain(int button, int state, int x, int y){
 
 //-------------------mouse button------------------
 
-void init_cenario() {
-    //inicializando
-    GUI::displayInit();
+
+void draw_Scenario(bool action){
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    if( action ){
+        gluLookAt(1,1,8,  0,0,0,  0,1,0);
+    }
+
+    GUI::global2camera(glutGUI::cam->e, glutGUI::cam->c, glutGUI::cam->u);
+
+
+
     loadBasicScenario();
 
     //GUI::drawOrigin(0.5);   //desenha origem do cenário ao centro
 
-    GUI::setLight( 1, 0.5, 4.5, 1.5, true, false, false, false,pontLight,spotLight);
+    GUI::setLight( 1, 0.5, 4.5, 1.5, true, false, false, false, pontLight, spotLight);
     GUI::setColor( 0.85, 0.755, 0.18, 1, true);
 
     GUI::drawFloor(12.2,10.2,0.9);
@@ -209,7 +222,10 @@ void init_cenario() {
 
     for( int i=0; i<objsVectorSize; i++){
         glPushMatrix();
-        objsVector[i]->desenha();
+            objsVector[i]->desenha();
+            if( posSelecionado == i){
+                objsVector[posSelecionado]->selected = true;
+            }
         glPopMatrix();
     }
 
@@ -228,45 +244,40 @@ void init_cenario() {
         //bool boundariesFloorFB_Z =
 
 
-        Vetor3D p_light = Vetor3D( static_cast<GLfloat>(glutGUI::lx) + 0.35,
+        Vetor3D posLight = Vetor3D( static_cast<GLfloat>(glutGUI::lx) + 0.35,
                                    static_cast<GLfloat>(glutGUI::ly) + 4.5,
                                    static_cast<GLfloat>(glutGUI::lz) + 1.5);
-        Vetor3D p_obj = Vetor3D();
-
-//        cout << p_light.x << " x-pos light / "
-//             << p_light.y << " y-pos light / "
-//             << p_light.z << " z-pos light;\n";
+        Vetor3D posObj = Vetor3D();
 
         float lightPos[4] = {glProjPosX, glProjPosY, glProjPosZ, static_cast<float>(pontLight) };
         glColor3d(0.0, 0.0, 0.0);
-//        glColor4d(0.0, 0.0, 0.0, 0.85);
 
         glDisable(GL_LIGHTING);
         for( int i = 0; i < objsVectorSize; ++i ){
             bool tempSelectAux = objsVector[i]->selected;
             objsVector[i]->selected = false;
 
-            p_obj.x = objsVector[i]->trans.x;
-            p_obj.y = objsVector[i]->trans.y;
-            p_obj.z = objsVector[i]->trans.z;
+            posObj.x = objsVector[i]->trans.x;
+            posObj.y = objsVector[i]->trans.y;
+            posObj.z = objsVector[i]->trans.z;
 
-            Vetor3D vet_AB = Vetor3D(p_obj.x - p_light.x , p_obj.y - p_light.y , p_obj.z - p_light.z );
-            GLfloat comp_AB = sqrt( (vet_AB.x * vet_AB.x) + (vet_AB.y * vet_AB.y)  + (vet_AB.z * vet_AB.z) );
+            Vetor3D vect_AB = Vetor3D(posObj.x - posLight.x , posObj.y - posLight.y , posObj.z - posLight.z );
+            GLfloat comp_AB = sqrt( (vect_AB.x * vect_AB.x) + (vect_AB.y * vect_AB.y)  + (vect_AB.z * vect_AB.z) );
 
 
             // sombra parede a esquerda
-            bool hab_leftWall = false;
-            if ( comp_AB > 3.30 && (p_obj.x < -1.5 && p_obj.x > -6) ){
-                hab_leftWall = true;
+            bool enabLeftWall = false;
+            if ( comp_AB > 3.30 && (posObj.x < -1.5 && posObj.x > -6) ){
+                enabLeftWall = true;
             }
+
             // sombra parede a direita
-            bool hab_rightWall = false;
-            if ( comp_AB > 3.30 && (p_obj.x < 6 && p_obj.x > 1.5) ){
-                hab_rightWall = true;
+            bool enabRightWall = false;
+            if ( comp_AB > 3.30 && (posObj.x < 6 && posObj.x > 1.5) ){
+                enabRightWall = true;
             }
 
             //sombra no chão
-
             if( boundariesFloorLR ){
                 glPushMatrix();
                     GUI::shadowMatrixYk(sombra, lightPos, k_shadow);
@@ -274,9 +285,9 @@ void init_cenario() {
                     objsVector[i]->desenha();
                 glPopMatrix();
             }
-            //sombra parede esquerda
 
-            if( boundariesFloorLR && hab_leftWall ){
+            //sombra parede esquerda
+            if( boundariesFloorLR && enabLeftWall ){
                 glPushMatrix();
                     GLfloat planoLeft[4] = {1,0,0, 5.9881};
                     GUI::shadowMatrix(sombra, planoLeft, lightPos);
@@ -284,9 +295,9 @@ void init_cenario() {
                     objsVector[i]->desenha();
                 glPopMatrix();
             }
-            //sombra parede direita
 
-            if( boundariesFloorLR && hab_rightWall ){
+            //sombra parede direita
+            if( boundariesFloorLR && enabRightWall ){
                 glPushMatrix();
                     GLfloat planoRight[4] = {-1,0,0, 5.9881 };
                     GUI::shadowMatrix(sombra, planoRight, lightPos);
@@ -294,8 +305,8 @@ void init_cenario() {
                     objsVector[i]->desenha();
                 glPopMatrix();
             }
-            //sombra parede fundo
 
+            //sombra parede fundo
             if(boundariesFloorLR ){
                 glPushMatrix();
                     GLfloat planoBack[4] = {0,1,1, 5 + k_shadow};
@@ -305,7 +316,7 @@ void init_cenario() {
                 glPopMatrix();
             }
 
-            p_obj.x = 0; p_obj.y = 0; p_obj.z = 0;
+            posObj.x = 0; posObj.y = 0; posObj.z = 0;
             objsVector[i]->selected = tempSelectAux;
         }
 
@@ -347,8 +358,20 @@ void init_cenario() {
         }
     }
 
-    GUI::displayEnd();
+
+
+//  visualização na viewport
+    if( action ){
+        glPushMatrix();
+            GUI::local2GlobalCam(glutGUI::cam->e, glutGUI::cam->c, glutGUI::cam->u);
+            GUI::setColor(0,0,1, 0.8);
+            GUI::drawCamera(0.4);
+        glPopMatrix();
+    }
+
 }
+
+
 
 
 void loadObjsListFromFile(){    // carregando objetos e suas caracterísitcas do arquivo
@@ -528,6 +551,7 @@ void unmarkSelection(){
 
     if( posSelecionado >= 0 && posSelecionado < objsVectorSize ){
         objsVector[posSelecionado]->selected = false;
+        posSelecionado = -1;
     }
     glutGUI::enable_translate = false;
     glutGUI::enable_rotate = false;
@@ -551,6 +575,7 @@ void deleteSelectedObj(){   // deletando objeto selecionado
 
     if( posSelecionado >= 0 && posSelecionado < objsVectorSize ){
         objsVector.erase(objsVector.begin() + posSelecionado );
+        posSelecionado--;
         objsVectorSize--;
     }
 }
@@ -567,14 +592,31 @@ void deleteLastObj(){
     }
 }
 
+//-------------------------------------------
 
 
+void init_display(){
+    GUI::displayInit();
+
+        draw_Scenario( false );
+
+        if( enable_viewport ){
+            GUI::glScissoredViewport(0, glutGUI::height - (glutGUI::height/2.95) , glutGUI::width/3, glutGUI::height/3);
+            // desenhando dentro da viewport
+            draw_Scenario( true );
+        }
+
+    GUI::displayEnd();
+}
+
+//-------------------------------------------
 
 void teclado(unsigned char key, int x, int y) {
     GUI::keyInit(key,x,y);
 
 
     switch (key) {
+
     case 'l':   //translante fonte de luz
         if(glutGUI::enable_translate){
             glutGUI::enable_translate = false;
@@ -589,6 +631,16 @@ void teclado(unsigned char key, int x, int y) {
             glutGUI::enable_shear = false;
         }
         glutGUI::trans_luz = !glutGUI::trans_luz;
+        break;
+
+    case 'd':   //alterando tipos de luz
+        if(spotLight){
+            spotLight = false;
+            pontLight = true;
+        } else {
+            spotLight = true;
+            pontLight = true;
+        }
         break;
 
     //----------------sombra
@@ -618,6 +670,17 @@ void teclado(unsigned char key, int x, int y) {
             glutGUI::enable_shear     = false;
         }
         break;
+    case 'J':
+        if(glutGUI::trans_obj && glutGUI::enable_rotate && !glutGUI::trans_luz){
+            glutGUI::use_quatern = !glutGUI::use_quatern;
+            if(!glutGUI::use_quatern){
+                cout << "rotate using quaternion - off \n";
+            }
+            if(glutGUI::use_quatern){
+                cout << "rotate using quaternion - on \n";
+            }
+        }
+        break;
 
     case 'k':        //SCALE
         if(glutGUI::trans_obj && !glutGUI::trans_luz){
@@ -640,6 +703,11 @@ void teclado(unsigned char key, int x, int y) {
     case 'i':
         if(glutGUI::trans_obj && !glutGUI::trans_luz){
             reflectSelectedObj();
+        }
+        break;
+    case 'I':
+        if(glutGUI::trans_obj && !glutGUI::trans_luz){
+            cout << "object reflection";
         }
         break;
 
@@ -731,38 +799,15 @@ void teclado(unsigned char key, int x, int y) {
 
         //mudança na projeção
     case 'o':
-//        if( glutGUI::perspective )
-//          glutGUI::perspective = false;   //projeção ortogonal
         glutGUI::ortho = !glutGUI::ortho;
-                //        glutGUI::perspective = false;
-                //        glutGUI::ortho = true;
-                //        cam = new CameraDistante(6,2,4, 0,0,0, 0,1,0);
-                //        cout << ("cam: 9; perspective false; ortho true \n");
-                //        break;
         break;
     case 'p':
-//        if( glutGUI::ortho )
-//            glutGUI::ortho = false;         //projeção perspectiva
         glutGUI::ortho = !glutGUI::ortho;
         glutGUI::perspective = !glutGUI::perspective;
         break;
-
-    case '3':{
-        glutGUI::cam = new CameraJogo(0.2,4,-17,  0,0,2.7,  0,1,0); //-10,10,-20,  2,0,0,  0,1,0
+    case 'e':
+        enable_viewport = !enable_viewport;
         break;
-        }
-    case '4':{
-        glutGUI::cam = new CameraJogo(5,8,-18,  -1,-3,2,  0.4,1,0);  //5,3,-18,  0,1,8,  0.3,1,
-        break;
-        }
-    case '5':{
-        glutGUI::cam = new CameraDistante(8,19,21,  1,1,3,  0,1,0);  //8,19,21,  1,1,3,  0,1,0
-        break;
-        }
-    case '6':{
-        glutGUI::cam = new CameraDistante(-7,3,14,  5.5,-1,-8.5,  0,1,0);  //-7,3,14,  5.5,-1,-8.5,  0,1,0
-        break;
-        }
 
 
     // resolvendo assuntos da Janela de Renderização
@@ -809,7 +854,8 @@ int main(){
 
     loadObjsListFromFile();
 
-    GUI gui = GUI(windWidth, windHeight, init_cenario, teclado, mouseButtonMain, "CG - 2024.2");
+//    GUI gui = GUI(windWidth, windHeight, init_cenario, teclado, mouseButtonMain, "CG - 2024.2");
+    GUI gui = GUI(windWidth, windHeight, init_display, teclado, mouseButtonMain, "CG - 2024.2");
 }
 
 
