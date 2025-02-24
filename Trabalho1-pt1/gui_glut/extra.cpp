@@ -56,6 +56,8 @@ bool glutGUI::enable_rotate = false;
 bool glutGUI::enable_scale = false;
 bool glutGUI::enable_shear = false;
 
+bool glutGUI::use_quatern = false;
+
 float glutGUI::tx = 0.0;
 float glutGUI::ty = 0.0;
 float glutGUI::tz = 0.0;
@@ -195,7 +197,7 @@ void glutGUI::defaultDisplay() {
 
 void glutGUI::changeCam()
 {
-    posCam = (posCam)%16;
+    posCam = (posCam)%18;
     delete cam;
     switch (posCam) {
     case 0:
@@ -262,38 +264,50 @@ void glutGUI::changeCam()
     case 10:
         glutGUI::perspective = false;
         glutGUI::ortho = false;
-        cam = new CameraDistante(-2,3,5, -2,3,0, 0,1,0);
-        cout << ("cam: 10; perspective false; ortho false \n");
+        cam = new CameraDistante(-5,3,5, -5,3,0, 0,1,0);
+        cout << ("cam: 10; perspective false; ortho false; obliqua true \n");
         break;
     case 11:
-        glutGUI::perspective = true;
-        glutGUI::pontosDeFuga = true;
-        cam = new CameraDistante(0,1,1.5, 0,1,0, 0,1,0);
-        cout << ("cam: 11; perspective true; ortho false; pontosDeFuga true \n");
+        glutGUI::perspective = false;
+        glutGUI::ortho = false;
+        cam = new CameraDistante(-2,3,5, -2,3,0, 0,1,0);
+        cout << ("cam: 11; perspective false; ortho false; obliqua true \n");
         break;
     case 12:
-        glutGUI::perspective = true;
-        glutGUI::pontosDeFuga = true;
-        cam = new CameraDistante(1.2,0.5,1.2, 0,0.5,0, 0,1,0);
-        cout << ("cam: 12; perspective true; ortho false; pontosDeFuga true \n");
+        glutGUI::perspective = false;
+        glutGUI::ortho = false;
+        cam = new CameraDistante(1,3,5, 1,3,0, 0,1,0);
+        cout << ("cam: 12; perspective false; ortho false; obliqua true \n");
         break;
     case 13:
         glutGUI::perspective = true;
         glutGUI::pontosDeFuga = true;
-        cam = new CameraDistante(0.5,1.2,1.2, 0.5,0.5,0, 0,1,0);
-        cout << ("cam: 13; perspective true; ortho false; pontosDeFuga true \n");
+        cam = new CameraDistante(0,1,1.5, 0,1,0, 0,1,0);
+        cout << ("cam: 13; perspective true; ortho false; 01 pontosDeFuga true \n");
         break;
     case 14:
         glutGUI::perspective = true;
         glutGUI::pontosDeFuga = true;
-        cam = new CameraDistante(1.2,0.2,1.2, 0,1,0, 0,1,0);
-        cout << ("cam: 14; perspective true; ortho false; pontosDeFuga true \n");
+        cam = new CameraDistante(1.2,0.5,1.2, 0,0.5,0, 0,1,0);
+        cout << ("cam: 14; perspective true; ortho false; 02 pontosDeFuga true \n");
         break;
     case 15:
         glutGUI::perspective = true;
+        glutGUI::pontosDeFuga = true;
+        cam = new CameraDistante(0.5,1.2,1.2, 0.5,0.5,0, 0,1,0);
+        cout << ("cam: 15; perspective true; ortho false; 01 pontosDeFuga true \n");
+        break;
+    case 16:
+        glutGUI::perspective = true;
+        glutGUI::pontosDeFuga = true;
+        cam = new CameraDistante(1.2,0.2,1.2, 0,1,0, 0,1,0);
+        cout << ("cam: 16; perspective true; ortho false; 03 pontosDeFuga true \n");
+        break;
+    case 17:
+        glutGUI::perspective = true;
         glutGUI::pontosDeFuga = false;
         cam = new CameraDistante(savedCamera[0],savedCamera[1],savedCamera[2],savedCamera[3],savedCamera[4],savedCamera[5],savedCamera[6],savedCamera[7],savedCamera[8]);
-        cout << ("cam: 15; perspective true; ortho false; pontosDeFuga false \n");
+        cout << ("cam: 17; perspective true; ortho false; pontosDeFuga false \n");
         break;
     }
     orthof = 0.00025*(cam->c - cam->e).modulo();
@@ -561,6 +575,7 @@ void glutGUI::mouseButton(int button, int state, int x, int y) {
 
 //}
 
+
 void glutGUI::mouseMove(int x, int y) {
     if ( mouse_lock == ONLY_X ) last_y = y;
     if ( mouse_lock == ONLY_Y ) last_x = x;
@@ -587,6 +602,7 @@ void glutGUI::mouseMove(int x, int y) {
             //Rotations
             if( !enable_translate && enable_rotate && !enable_scale  && !enable_shear){ //Rot em X
                 fator = 4.0;
+                if(use_quatern) fator = 15.0;
                 dax = (y - last_y)/fator;
                 ax += dax;
             }
@@ -626,6 +642,7 @@ void glutGUI::mouseMove(int x, int y) {
             //Rotations
             if( !enable_translate && enable_rotate && !enable_scale  && !enable_shear){ //Rot em Y
                 fator = 4.0;
+                if(use_quatern) fator = 15.0;
                 day = (x - last_x)/fator;
                 ay += day;
             }
@@ -669,6 +686,7 @@ void glutGUI::mouseMove(int x, int y) {
             //Rotations
             if( !enable_translate && enable_rotate && !enable_scale  && !enable_shear){ //Rot em Z
                 fator = 4.0;
+                if(use_quatern) fator = 15.0;
                 daz = (last_x - x )/fator;
                 az += daz;
             }
@@ -684,23 +702,19 @@ void glutGUI::mouseMove(int x, int y) {
         }
     }
 
-//    if ( lbpressed && !rbpressed && !mbpressed ) {
-
-//        if ( trans_luz && obj_transp ) {
-//            fator = 100.0;
-//            transparencia -= (y - last_y)/fator;
-//            if (transparencia < 0.0) transparencia = 0.0;
-//            if (transparencia > 1.0) transparencia = 1.0;
-//        }
-//    }
-
-//    if ( !lbpressed && rbpressed && !mbpressed ) {
-
-//    }
-//    if ( lbpressed && rbpressed && !mbpressed ) {
-
-//    }
-
+    if( !lbpressed && !rbpressed && mbpressed ){
+        if( trans_obj ){
+            //Rotations
+            if( !enable_translate && enable_rotate && !enable_scale  && !enable_shear){ //Rot em XY
+                fator = 4.0;
+                if(use_quatern) fator = 15.0;
+                dax = (last_x - x )/fator;
+                day = -dax;
+                ax += dax;
+                ay += dax;
+            }
+        }
+    }
     last_x = x;
     last_y = y;
 }

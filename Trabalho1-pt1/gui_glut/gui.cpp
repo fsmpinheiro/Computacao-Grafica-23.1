@@ -3,6 +3,7 @@
 //-----Texturas---------
 //texture
 #include "OpenTextures.h"
+#include <math.h>
 
 //texture
 bool renderTexture = true;
@@ -204,29 +205,31 @@ void GUI::displayInit(){
     const float ar = glutGUI::height>0 ? (float) glutGUI::width / (float) glutGUI::height : 1.0;
     const float w = glutGUI::width;
     const float h = glutGUI::height;
-    float orthof = glutGUI::orthof;
+    float orthof = glutGUI::orthof;    //==> ortho factor -> 0,003;
 
     glMatrixMode(GL_PROJECTION);
 
     if (!glutGUI::picking)
         glLoadIdentity();
     else {
-        //lembrar de nao inicializar a matriz de projecao,
-        //pois a gluPickMatrix é que redefine os planos de corte do volume de visualizacao reduzido
-        //(apenas na vizinhanca do pixel selecionado pelo mouse)
+        /**lembrar de nao inicializar a matriz de projecao,
+           pois a gluPickMatrix é que redefine os planos de
+           corte do volume de visualizacao reduzido
+           (apenas na vizinhanca do pixel selecionado pelo mouse)**/
     }
 
-    if (glutGUI::perspective)
-        if (!glutGUI::pontosDeFuga)
-            gluPerspective(30.,ar,0.1,1000.);
-        else
-            gluPerspective(150.,ar,0.1,1000.);
-    else {
-        if (glutGUI::ortho) {
-            //orthof = 0.0025;
-            glOrtho(-orthof*w,orthof*w,-orthof*h,orthof*h,0.0,100.0);
+    if (glutGUI::perspective){
+        if (!glutGUI::pontosDeFuga){
+            gluPerspective(40., ar, 0.1,1000.);
         } else {
-            //obliqua  //   S . T . T(0,0,-near) . Sh . T(0,0,near)
+            gluPerspective(150., ar, 0.1, 1000.);
+        }
+    } else {
+        if (glutGUI::ortho) {
+//            orthof = 0.0025;
+            glOrtho(-orthof * w, orthof * w, -orthof * h, orthof * h, 0.0, 100.0);
+        } else {
+            //obliqua   //  S . T . T(0,0,-near) . Sh . T(0,0,near)
             float s = 5;
             float near = 0;
             glOrtho(-s, s, -s*h/w, s*h/w, near, 20);
@@ -236,12 +239,13 @@ void GUI::displayInit(){
                 alfa = alfa*(PI/180); //grau2rad
                 float phi = -75; //-60; //-30 //-90
                 phi = phi*(PI/180); //grau2rad
-                float transform[16] = {
-                    1.0,    0.0,    1.0/tan(alfa),   0.0,
-                    0.0,    1.0,    1.0/tan(phi),    0.0,
-                    0.0,    0.0,    1.0,             0.0,
-                    0.0,    0.0,    0.0,             1.0
-                                     };
+                                        float t_a = 1.0/tan(alfa);
+                                        float t_p = 1.0/tan( phi);
+                float transform[16] = { 1.0,    0.0,    t_a,    0.0,
+                                        0.0,    1.0,    t_p,    0.0,
+                                        0.0,    0.0,    1.0,    0.0,
+                                        0.0,    0.0,    0.0,    1.0    };
+
                 glMultTransposeMatrixf( transform );
             glTranslatef(0.0,0.0,near); //translada near em z
         }
@@ -256,7 +260,7 @@ void GUI::displayInit(){
         gluLookAt(glutGUI::cam->e.x,glutGUI::cam->e.y,glutGUI::cam->e.z, glutGUI::cam->c.x,glutGUI::cam->c.y,glutGUI::cam->c.z, glutGUI::cam->u.x,glutGUI::cam->u.y,glutGUI::cam->u.z);
         //gluLookAt(0,10,20,  0,0,0,  0,1,0);
 
-    //GUI::setLight(7,0,4,0,true,false,true);
+    GUI::setLight(7,0,4,0,true,false,true);
 }
 
 void GUI::displayEnd()
@@ -281,8 +285,11 @@ void GUI::setLight(int id, float posx, float posy, float posz, bool onOffKeyDefa
     glutGUI::spot_light[id] = spot;
 
     //habilita/desabilita luz
-    if (glutGUI::iluminacao && glutGUI::enabled_light[id]) glEnable(GL_LIGHT0+id);
-    else glDisable(GL_LIGHT0+id);
+    if (glutGUI::iluminacao && glutGUI::enabled_light[id]){
+        glEnable(GL_LIGHT0+id);
+    } else {
+        glDisable(GL_LIGHT0+id);
+    }
 
     //definindo intensidades de cor da luz
     GLfloat light_ambient[]  = { 0.2f, 0.2f, 0.2f, 1.0f };
@@ -326,7 +333,7 @@ void GUI::setLight(int id, float posx, float posy, float posz, bool onOffKeyDefa
 
     //spot_light
     if (glutGUI::spot_light[id]) {
-        const GLfloat light_direction[] = { 0.0f, 0.0f, -1.0f, 1.0f }; //{ -(2.0f + lx), -(5.0f + ly), -(5.0f + lz), 1.0f };
+        const GLfloat light_direction[] = { 0.0f, -1.0f, 0.0f, 1.0f }; //{ -(2.0f + lx), -(5.0f + ly), -(5.0f + lz), 1.0f };
         glLightfv(GL_LIGHT0+id, GL_SPOT_DIRECTION, light_direction);
         glLightf(GL_LIGHT0+id, GL_SPOT_CUTOFF, glutGUI::spot_angle);
     } else {
@@ -457,6 +464,57 @@ void GUI::glReflectPlaneXYf()
                          };
     glMultTransposeMatrixd( transform );
 }
+
+void GUI::quaternionRotationf( float degree, float x, float y, float z)
+{
+
+    /** Esta função pega um ângulo e um eixo de rotação e os converte em um quatérnio.
+     * Um exemplo de um eixo e ângulo é o que passamos para glRotatef(). Essa é uma
+     * rotação de ângulo do eixo. É assumido que um ângulo em graus está sendo passado.
+     * Em vez de usar glRotatef(), agora podemos lidar com as rotações nós mesmos. **/
+
+    // As equações para o ângulo do eixo em relação aos quatérnions são:
+
+    // w =  cos( teta / 2 ) ;           x = X * sen( teta / 2 )
+    // y = Y * sen( teta / 2 ) ;        z = Z * sen( teta / 2 )
+
+    // Primeiro queremos converter os graus em radianos,
+    // já que o ângulo é assumido como estando em radianos
+    float rad_angle = float((degree / 180.0f) * PI);
+
+    // Aqui calculamos o seno( teta / 2) uma vez para otimização
+    float result = (float)sin( rad_angle / 2.0f );
+
+        // Calcualte the w' value by cos( theta / 2 )
+        float w_ = (float)cos( rad_angle / 2.0f );
+
+        // Calculate the x', y' and z' of the quaternion
+        float x_ = float(x * result);
+        float y_ = float(y * result);
+        float z_ = float(z * result);
+
+    double pMatrix [16] = {
+    1.0f - 2.0f * ( y_ * y_ + z_ * z_ ),
+        2.0f * ( x_ * y_ - w_ * z_ ),
+            2.0f * ( x_ * z_ + w_ * y_ ),
+                0,
+
+    2.0f * ( x_ * y_ + w_ * z_ ),
+        1.0f - 2.0f * ( x_ * x_ + z_ * z_ ),
+            2.0f * ( y_ * z_ - w_ * x_ ),
+                0,
+
+    2.0f * ( x_ * z_ - w_ * y_ ),
+        2.0f * ( y_ * z_ + w_ * x_ ),
+            1.0f - 2.0f * ( x_ * x_ + y_ * y_ ),
+                0,
+
+        0,  0,  0,  1
+    };
+
+    glMultTransposeMatrixd( pMatrix );
+}
+
 //---------------transformacoes---------------
 
 //-------------------camera-------------------
@@ -520,6 +578,45 @@ void GUI::global2cameraAlternativa(Vetor3D olho, Vetor3D centro, Vetor3D up)
     glMultTransposeMatrixf(Tcam);
     glTranslatef(-Oc.x,-Oc.y,-Oc.z);
 }
+
+void GUI::global2LocalCam(Vetor3D olho, Vetor3D centro, Vetor3D up){
+    Vetor3D Oc = olho;
+    Vetor3D kc = olho - centro;
+    !kc;
+    Vetor3D ic = up ^ kc;
+    !ic;
+    Vetor3D jc = kc ^ ic;
+    !jc;
+    float Tcam[16] = {
+        ic.x, ic.y, ic.z, ic * (Oc*(-1)),
+        jc.x, jc.y, jc.z, jc * (Oc*(-1)),
+        kc.x, kc.y, kc.z, kc * (Oc*(-1)),
+        0.0, 0.0, 0.0, 1.0
+    };
+
+    glMultTransposeMatrixf( Tcam );
+}
+
+void GUI::local2GlobalCam(Vetor3D olho, Vetor3D centro, Vetor3D up){
+    Vetor3D Oc = olho;
+    Vetor3D kc = olho - centro;
+    !kc;
+    Vetor3D ic = up ^ kc;
+    !ic;
+    Vetor3D jc = kc ^ ic;
+//    !jc;
+    float TcamInv[16] = {
+        ic.x, jc.x, kc.x,  Oc.x,
+        ic.y, jc.y, kc.y,  Oc.y,
+        ic.z, jc.z, kc.z,  Oc.z,
+         0.0,  0.0,  0.0,  1.0
+    };
+
+    glMultTransposeMatrixf( TcamInv );
+
+}
+
+
 //-------------------camera-------------------
 
 //-------------------sombra-------------------
@@ -654,7 +751,9 @@ void GUI::pickingInit(GLint cursorX, GLint cursorY, int w, int h, GLuint* select
     //glPushMatrix();
     glLoadIdentity();
 
-    //redefinindo os planos de corte do volume de visualizacao reduzido (apenas na vizinhanca do pixel selecionado pelo mouse)
+    /**redefinindo os planos de corte do volume de
+     * visualizacao reduzido (apenas na vizinhanca
+     * do pixel selecionado pelo mouse) **/
     gluPickMatrix(cursorX,viewport[3]-cursorY,w,h,viewport);
 
     glDisable(GL_LIGHTING);

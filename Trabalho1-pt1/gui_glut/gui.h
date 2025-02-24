@@ -46,12 +46,16 @@ class GUI {
         static void glReflectPlaneYZf(); //inverte sinal de X
         static void glReflectPlaneXZf(); //inverte sinal de Y
         static void glReflectPlaneXYf(); //inverte sinal de Z
+        static void quaternionRotationf(float degree, float x, float y, float z);
         //---------------transformacoes---------------
 
         //-------------------camera-------------------
         static void camera2global( Vetor3D olho, Vetor3D centro, Vetor3D up );
         static void global2camera( Vetor3D olho, Vetor3D centro, Vetor3D up );
         static void global2cameraAlternativa( Vetor3D olho, Vetor3D centro, Vetor3D up );
+
+        static void global2LocalCam( Vetor3D olho, Vetor3D centro, Vetor3D up );
+        static void local2GlobalCam( Vetor3D olho, Vetor3D centro, Vetor3D up );
         //-------------------camera-------------------
 
         //-------------------sombra-------------------

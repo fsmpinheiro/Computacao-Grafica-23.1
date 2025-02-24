@@ -86,6 +86,8 @@ public:
     static bool enable_scale;     // = false;
     static bool enable_shear;     // = false;
 
+    static bool use_quatern;      // = false;
+
     static float tx;// = 0.0;
     static float ty;// = 0.0;
     static float tz;// = 0.0;
@@ -132,9 +134,10 @@ public:
     static void resize(int w, int h);
     static void defaultDisplay();
     static void changeCam();
-    static void defaultKey(unsigned char key, int x, int y);
     static void autoCamMove(float value, Axis axis, int nIterations = 10);
     static void autoCamMotion(float value, Axis axis, int nIterations = 10);
+
+    static void defaultKey(unsigned char key, int x, int y);
     static void idle(void);
     static void defaultMouseButton(int button, int state, int x, int y);
     static void mouseButton(int button, int state, int x, int y);
