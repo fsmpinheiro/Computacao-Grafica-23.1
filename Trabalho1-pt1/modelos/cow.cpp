@@ -28,6 +28,7 @@ void Cow::desenha(){
             GUI::glReflectPlaneXZf();
         }
 
+        GUI::glShearXYf(shear.x, shear.y);
         model->draw();
     glPopMatrix();
 
@@ -48,6 +49,8 @@ void Cow::desenha(){
             GUI::setColor( 0.5,  0.9,  0.3, 0.45 ); //especular 0.35
         }else if(glutGUI::trans_obj && glutGUI::enable_scale){
             GUI::setColor( 0.8,    1,  0.1, 0.45 ); //especular 0.35
+        }else if(glutGUI::trans_obj && glutGUI::enable_shear){
+            GUI::setColor( 0.7,    0.3,  1, 0.45 ); //especular 0.35
         }else{
             GUI::setColor(   0,    0,  0.9, 0.45 ); //especular 0.35
         }

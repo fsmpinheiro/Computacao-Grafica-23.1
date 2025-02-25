@@ -26,6 +26,8 @@ void Casa::desenha(){
             GUI::glReflectPlaneXYf();
         }
 
+        GUI::glShearXYf(shear.x, shear.y);
+
         if(changCullFace) glDisable(GL_CULL_FACE);
         glBegin(GL_TRIANGLES);    //telhado -frontal
         glNormal3f(0,1,1);
@@ -176,6 +178,8 @@ void Casa::desenha(){
                 GUI::setColor( 0.5,  0.9,  0.3, 0.45 ); //especular 0.35
             }else if(glutGUI::trans_obj && glutGUI::enable_scale){
                 GUI::setColor( 0.8,    1,  0.1, 0.45 ); //especular 0.35
+            }else if(glutGUI::trans_obj && glutGUI::enable_shear){
+                GUI::setColor( 0.7,    0.3,  1, 0.45 ); //especular 0.35
             }else{
                 GUI::setColor(   0,    0,  0.9, 0.45 ); //especular 0.35
             }

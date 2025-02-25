@@ -24,6 +24,8 @@ void Pinheiro::desenha(){
         GUI::glReflectPlaneXZf();
     }
 
+    GUI::glShearXYf(shear.x, shear.y);
+
     //Quadrica para os Cones/Cilindros
     GLUquadricObj *quad = gluNewQuadric();
 
@@ -112,6 +114,8 @@ void Pinheiro::desenha(){
                 GUI::setColor( 0.5,  0.9,  0.3, 0.45 ); //especular 0.35
             }else if(glutGUI::trans_obj && glutGUI::enable_scale){
                 GUI::setColor( 0.8,    1,  0.1, 0.45 ); //especular 0.35
+            }else if(glutGUI::trans_obj && glutGUI::enable_shear){
+                GUI::setColor( 0.7,    0.3,  1, 0.45 ); //especular 0.35
             }else{
                 GUI::setColor(   0,    0,  0.9, 0.45 ); //especular 0.35
             }
